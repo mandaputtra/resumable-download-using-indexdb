@@ -92,7 +92,10 @@ async function downloadInChunks(url: string, filename: string) {
     } else {
       if (res.status === 416) {
         // Remove cache on indexed db if the download cannot be resumed
-        // TODO: The function for removing cache is broken
+        // TODO: The function for removing cache is broken, need to fix it on upstream libs
+        // can always delete the whole database with
+        // indexedDB.deleteDatabase("fileSystem")
+        // although if you have multiple download happen in the same indexedDB it would restart from start too
         // await filehandle.remove()
         throw Error("Download Error, Removing Cache");
       } else {
@@ -104,7 +107,7 @@ async function downloadInChunks(url: string, filename: string) {
   // Saving on the indexeddb store are done
   await writeable.close();
 
-  // Save on the disk, preferably on download folders
+  // Save on the disk, preferably on /Downloads folder
   const completedFile = filehandle.getFile();
   const fileSaveHandler = await showSaveFilePicker({
     _preferPolyfill: false,
